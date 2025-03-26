@@ -1,0 +1,67 @@
+/* Estilos Gerais */
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #f0f8ff;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+}
+
+/* Container do Jogo */
+#game-container {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+/* Canvas do Jogo */
+#game-canvas {
+    border: 8px solid #4a7c59;
+}
+
+#score-display {
+    margin: 10px 0;
+    font-size: 20px;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+/* Exibição de Mensagens */
+#message-display {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    display: none;
+    font-size: 14px;
+    color: #4caf50;
+}
+
+/* Botão de Início */
+#start-button {
+    margin-top: 20px;
+    padding: 12px 25px;
+    font-size: 18px;
+    background-color: #4caf50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+    transition: all 0.3s ease;
+}
+
+#start-button:hover {
+    background-color: #388e3c;
+    transform: scale(1.05);
+}
