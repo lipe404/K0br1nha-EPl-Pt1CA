@@ -2,35 +2,37 @@
 body {
     margin: 0;
     padding: 0;
+    /* Layout centralizado */
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
-    background-color: #f0f8ff;
+    /* Plano de fundo */
+    background: linear-gradient(270deg, #f875dc, #7d75f5, #bb71f7);
+    background-size: 600% 600%;
+    animation: bgAnim 10s ease infinite;
     font-family: 'Comic Sans MS', cursive, sans-serif;
     overflow: hidden;
     transition: background-color 0.3s ease;
 }
-
 /* Container do Jogo */
 #game-container {
     position: relative;
     transition: all 0.3s ease;
 }
-
 /* Canvas do Jogo */
 #game-canvas {
-    border: 8px solid #4a7c59;
+    border: 2px solid #f875dc;
+    box-shadow: 0 0 15px #f875dc, 0 0 30px #7d75f5, 0 0 45px #bb71f7;
 }
-
+/* Display de pontuação */
 #score-display {
     margin: 10px 0;
     font-size: 20px;
     color: #333;
     transition: all 0.3s ease;
 }
-
 /* Exibição de Mensagens */
 #message-display {
     position: absolute;
@@ -46,9 +48,11 @@ body {
     font-size: 14px;
     color: #4caf50;
 }
-
 /* Botão de Início */
 #start-button {
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 0 2px #fff;
     margin-top: 20px;
     padding: 12px 25px;
     font-size: 18px;
@@ -60,8 +64,29 @@ body {
     transition: all 0.3s;
     transition: all 0.3s ease;
 }
-
+#start-button::before {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, #fff, transparent);
+    animation: shine 2s infinite;
+    pointer-events: none;
+}
 #start-button:hover {
     background-color: #388e3c;
     transform: scale(1.05);
+}
+/* Animação de Fundo */
+@keyframes bgAnim {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+/* Animação dos botões */
+@keyframes shine {
+    0% { transform: rotate(0deg) translate(-50%, -50%); }
+    100% { transform: rotate(360deg) translate(-50%, -50%); }
 }
