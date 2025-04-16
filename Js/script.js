@@ -1,3 +1,13 @@
+/**
+ * Jogo da Cobrinha com animações de cores, mensagens cômicas, e design visual aprimorado.
+ * Desenvolvido por Felipe Toledo @spaceman.404.
+ *
+ * Melhorias incluídas neste código:
+ * - Comentários explicativos para cada função e bloco lógico
+ * - Otimizações de estrutura e modularização
+ * - Adição de transição de cores ao longo do jogo
+ * - Adição de mensagens humorísticas ao longo do jogo
+ */
 // Configurações do jogo
 const canvas = document.getElementById('game-canvas');
 const ctx = canvas.getContext('2d');
@@ -8,31 +18,35 @@ const scoreDisplay = document.createElement('div');
 scoreDisplay.id = 'score-display';
 document.body.insertBefore(scoreDisplay, startButton);
 // Variáveis do jogo
-let snake = [];
-let food = {};
-let direction = 'right';
-let nextDirection = 'right';
-let gameSpeed = 150;
-let score = 0;
-let gameLoop;
-let isGameOver = false;
-let currentColorIndex = 0;
-// Cores
+let snake = []; // Armazena os segmentos da cobrinha
+let food = {}; // Posição da comida
+let direction = 'right'; // Direção atual
+let nextDirection = 'right'; // Próxima direção
+let gameSpeed = 150; // Velocidade inicial do jogo
+let speedLevel = 0; // Nível de velocidade
+let score = 0; // Pontuação inicial
+let gameLoop; // Loop do jogo
+let isGameOver = false; // Flag de fim de jogo
+let currentColorIndex = 0; // Índice da cor atual
+let obstacles = []; // Obstáculos
+// Cores do corpo da cobra
 const snakeColors = [
-    '#4CAF50', '#FF5722', '#FFC107', '#FF9800', '#CDDC39', 
+    '#4CAF50', '#FF5722', '#FFC107', '#FF9800', '#CDDC39',
     '#8BC34A', '#FFEB3B', '#FF4081', '#3F51B5', '#2196F3',
     '#00BCD4', '#009688', '#E91E63', '#9C27B0', '#673AB7'
 ];
+// Cores de fundo do jogo
 const backgroundColors = [
-    '#f0f8ff', '#ffebee', '#e8f5e9', '#e3f2fd', '#f3e5f5',
-    '#fffde7', '#e0f7fa', '#fce4ec', '#e8eaf6', '#fff3e0'
+    '#4CAF50', '#FF5722', '#FFC107', '#FF9800', '#CDDC39',
+    '#8BC34A', '#FFEB3B', '#FF4081', '#3F51B5', '#2196F3',
+    '#00BCD4', '#009688', '#E91E63', '#9C27B0', '#673AB7'
 ];
 // Sistema de transição de cores
 let targetBackgroundColor = backgroundColors[0];
 let currentBackgroundColor = hexToRgb(backgroundColors[0]);
 let colorTransitionProgress = 1;
 const colorTransitionSpeed = 0.05;
-// Mensagens humorísticas
+// Mensagens
 const funnyMessages = [
     "Tem uma cobra nas minhas botas!",
     "Nhami nhami, delícia!",
@@ -61,9 +75,11 @@ function initGame() {
     direction = 'right';
     nextDirection = 'right';
     score = 0;
+    speedLevel = 0;
     gameSpeed = 150;
     currentColorIndex = 0;
     isGameOver = false;
+    obstacles = [];
     // Resetar cores
     targetBackgroundColor = backgroundColors[0];
     currentBackgroundColor = hexToRgb(backgroundColors[0]);
@@ -78,6 +94,64 @@ function initGame() {
     if (gameLoop) clearInterval(gameLoop);
     gameLoop = setInterval(gameStep, gameSpeed);
 }
+// Ajustar velocidade do jogo
+function adjustGameSpeed() {
+    // A cada 50 pontos, aumenta o nível de dificuldade
+    const newLevel = Math.floor(score / 50);
+    // Só atualiza se mudou de nível
+    if (newLevel > speedLevel) {
+        speedLevel = newLevel;
+        gameSpeed = Math.max(50, gameSpeed - 10); // Diminui a velocidade, mínimo 50ms
+        clearInterval(gameLoop);
+        gameLoop = setInterval(gameStep, gameSpeed);
+    }
+    // A cada 100 pontos, adicionar obstáculos
+    const level = Math.floor(score / 100);
+    if (level > 0 && score % 100 === 0) {
+        generateObstacles(level);
+    }
+}
+// Função para gerar obstáculos
+function generateObstacles(level) {
+    const gridSize = canvas.width / 20;
+    const numObstacles = level * 3; // Número de obstáculos cresce com o nível
+    obstacles = []; // Resetar obstáculos
+    for (let i = 0; i < numObstacles; i++) {
+        let valid = false;
+        let newX, newY;
+        while (!valid) {
+            newX = Math.floor(Math.random() * gridSize) * 20;
+            newY = Math.floor(Math.random() * gridSize) * 20;
+            valid = true;
+            // Impedir sobreposição com a cobra
+            for (const segment of snake) {
+                if (segment.x === newX && segment.y === newY) {
+                    valid = false;
+                    break;
+                }
+            }
+            // Impedir sobreposição com a comida
+            if (food.x === newX && food.y === newY) {
+                valid = false;
+            }
+        }
+        obstacles.push({x: newX, y: newY});
+    }
+}
+
+// Desenhar obstáculos
+function drawObstacles() {
+    ctx.fillStyle = '#555';
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 2;
+    obstacles.forEach(ob => {
+        ctx.beginPath();
+        roundRect(ctx, ob.x, ob.y, 20, 20, 5);
+        ctx.fill();
+        ctx.stroke();
+    });
+}
+
 // Gerar comida em posição aleatória
 function generateFood() {
     const gridSize = canvas.width / 20;
@@ -191,6 +265,7 @@ function handleFoodEaten() {
     clearInterval(gameLoop);
     gameLoop = setInterval(gameStep, gameSpeed);
     // Mostrar mensagem e gerar nova comida
+    adjustGameSpeed(); // Aqui ocorre o aumento de dificuldade progressivo
     showRandomMessage();
     generateFood();
 }
@@ -228,6 +303,13 @@ function checkCollisions() {
             return true;
         }
     }
+    // Colisão com obstáculos
+    for (const ob of obstacles) {
+        if (head.x === ob.x && head.y === ob.y) {
+            gameOver("VOCÊ BATEU EM UM BLOCO!");
+            return true;
+        }
+    }
     return false;
 }
 // Mostrar mensagem aleatória
@@ -259,9 +341,8 @@ function gameStep() {
     // Desenhar elementos
     drawFood();
     drawSnake();
+    drawObstacles();
 }
-// Funções auxiliares
-
 // Converter hex para RGB
 function hexToRgb(hex) {
     hex = hex.replace('#', '');
@@ -324,3 +405,12 @@ startButton.addEventListener('click', initGame);
 // Mensagem inicial
 messageDisplay.textContent = "Clique em 'Faça a cobra nascer' para jogar!";
 messageDisplay.style.display = 'block';
+
+// === SUGESTÕES DE MELHORIAS ===
+/**
+ * 4. Níveis: introduzir obstáculos e fases progressivas.
+ * 5. Controle por toque: suportar mobile com gestos.
+ * 6. Sons: adicionar efeitos sonoros e trilha de fundo.
+ * 7. Pausar/Reiniciar: criar botão para pausar e reiniciar.
+ * 9. Animações extras: partículas ou efeitos ao comer a comida.
+ */
