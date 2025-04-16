@@ -408,7 +408,6 @@ messageDisplay.style.display = 'block';
 
 // === SUGESTÕES DE MELHORIAS ===
 /**
- * 4. Níveis: introduzir obstáculos e fases progressivas.
  * 5. Controle por toque: suportar mobile com gestos.
  * 6. Sons: adicionar efeitos sonoros e trilha de fundo.
  * 7. Pausar/Reiniciar: criar botão para pausar e reiniciar.
