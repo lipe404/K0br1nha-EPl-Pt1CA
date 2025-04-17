@@ -233,7 +233,6 @@ function startCountdownAndGame() {
         }
     }, 1000);
 }
-
 // Ajustar velocidade do jogo
 function adjustGameSpeed() {
     // A cada 50 pontos, aumenta o nível de dificuldade
