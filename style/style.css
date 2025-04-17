@@ -14,6 +14,7 @@ body {
     animation: bgAnim 10s ease infinite;
     font-family: 'Comic Sans MS', cursive, sans-serif;
     overflow: hidden;
+    touch-action: none;
     transition: background-color 0.3s ease;
 }
 h1 {

@@ -613,12 +613,14 @@ let touchStartX = 0;
 let touchStartY = 0;
 // Capturar início do toque
 document.addEventListener('touchstart', function (e) {
+    e.preventDefault();
     const touch = e.touches[0];
     touchStartX = touch.clientX;
     touchStartY = touch.clientY;
 }, false);
 // Capturar fim do toque e calcular direção
 document.addEventListener('touchend', function (e) {
+    e.preventDefault();
     const touch = e.changedTouches[0];
     const dx = touch.clientX - touchStartX;
     const dy = touch.clientY - touchStartY;
