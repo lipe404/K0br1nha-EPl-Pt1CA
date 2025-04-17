@@ -103,6 +103,7 @@ const foodSound = new Audio('midia/food.mp3'); // Som de comida
 const gameOverSound = new Audio('midia/gameover.mp3'); // Som de game over
 // Inicializar o jogo
 function initGame() {
+    entrarEmTelaCheia(); // Ativar tela cheia
     // Resetar cobra (3 segmentos)
     snake = [
         {x: 160, y: 200},
@@ -587,10 +588,27 @@ function togglePauseGame() {
         gameLoop = setInterval(gameStep, gameSpeed);
     }
 }
+//Função para ativar o modo fullscreen
+function entrarEmTelaCheia() {
+    const el = document.documentElement;
+    if (el.requestFullscreen) {
+        el.requestFullscreen();
+    } else if (el.webkitRequestFullscreen) { // Safari
+        el.webkitRequestFullscreen();
+    } else if (el.msRequestFullscreen) { // IE/Edge antigos
+        el.msRequestFullscreen();
+    }
+    document.addEventListener('fullscreenchange', () => {
+        if (!document.fullscreenElement) {
+            pauseMenu.style.display = 'block';
+        }
+    });
+}
+
+// Botões do menu de pausa
 document.getElementById('resume-button').addEventListener('click', () => {
     togglePauseGame();
 });
-
 document.getElementById('restart-button').addEventListener('click', () => {
     pauseMenu.style.display = 'none';
     isGameOver = true;
