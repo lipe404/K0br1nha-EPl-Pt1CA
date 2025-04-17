@@ -64,6 +64,13 @@ const funnyMessages = [
     "Pula boi pula boiada!",
     "Academiaaaa das maravilhaaaas"
 ];
+//Sons do jogo
+const music = new Audio('midia/music2.mp3');
+music.loop = true;
+music.volume = 0.3; // Volume inicial
+const moveSound = new Audio('midia/move.mp3'); // Som de movimento
+const foodSound = new Audio('midia/food.mp3'); // Som de comida
+const gameOverSound = new Audio('midia/gameover.mp3'); // Som de game over
 // Inicializar o jogo
 function initGame() {
     // Resetar cobra (3 segmentos)
@@ -93,6 +100,7 @@ function initGame() {
     // Limpar qualquer jogo anterior e iniciar novo
     if (gameLoop) clearInterval(gameLoop);
     gameLoop = setInterval(gameStep, gameSpeed);
+    music.play();
 }
 // Ajustar velocidade do jogo
 function adjustGameSpeed() {
@@ -253,6 +261,9 @@ function updateSnake() {
 }
 // Lógica quando a cobra come a comida
 function handleFoodEaten() {
+    // Tocar som de comida
+    foodSound.currentTime = 0;
+    foodSound.play();
     // Aumentar pontuação
     score += 10;
     scoreDisplay.textContent = `Pontuação: ${score}`;
@@ -293,12 +304,18 @@ function checkCollisions() {
     const head = snake[0];
     // Colisão com parede
     if (head.x < 0 || head.y < 0 || head.x >= canvas.width || head.y >= canvas.height) {
+        gameOverSound.play();
+        music.pause();
+        music.currentTime = 0;
         gameOver("TCHOOOLAAA!");
         return true;
     }
     // Colisão com próprio corpo (ignorando a cabeça)
     for (let i = 1; i < snake.length; i++) {
         if (head.x === snake[i].x && head.y === snake[i].y) {
+            gameOverSound.play();
+            music.pause();
+            music.currentTime = 0;
             gameOver("É UM OROBOROS NÉ!");
             return true;
         }
@@ -306,6 +323,9 @@ function checkCollisions() {
     // Colisão com obstáculos
     for (const ob of obstacles) {
         if (head.x === ob.x && head.y === ob.y) {
+            gameOverSound.play();
+            music.pause();
+            music.currentTime = 0;
             gameOver("VOCÊ BATEU EM UM BLOCO!");
             return true;
         }
@@ -382,21 +402,29 @@ document.addEventListener('keydown', (e) => {
         case 'w':
         case 'W':
             if (direction !== 'down') nextDirection = 'up';
+            moveSound.currentTime = 0;
+            moveSound.play();
             break;
         case 'ArrowDown':
         case 's':
         case 'S':
             if (direction !== 'up') nextDirection = 'down';
+            moveSound.currentTime = 0;
+            moveSound.play();
             break;
         case 'ArrowLeft':
         case 'a':
         case 'A':
             if (direction !== 'right') nextDirection = 'left';
+            moveSound.currentTime = 0;
+            moveSound.play();
             break;
         case 'ArrowRight':
         case 'd':
         case 'D':
             if (direction !== 'left') nextDirection = 'right';
+            moveSound.currentTime = 0;
+            moveSound.play();
             break;
     }
 });
