@@ -7,6 +7,10 @@
  * - Otimizações de estrutura e modularização
  * - Adição de transição de cores ao longo do jogo
  * - Adição de mensagens humorísticas ao longo do jogo
+ * - Melhoria na lógica de colisão
+ * - Melhoria na lógica de pontuação e aumento de dificuldade
+ * - Melhoria na lógica de animação da cobra
+ * - Melhoria na lógica de obstáculos
  */
 // Configurações do jogo
 const canvas = document.getElementById('game-canvas');
@@ -604,8 +608,45 @@ canvas.addEventListener('mousemove', function (e) {
     mouse.x = e.clientX - rect.left;
     mouse.y = e.clientY - rect.top;
 });
+// Variáveis para capturar coordenadas do toque
+let touchStartX = 0;
+let touchStartY = 0;
+// Capturar início do toque
+document.addEventListener('touchstart', function (e) {
+    const touch = e.touches[0];
+    touchStartX = touch.clientX;
+    touchStartY = touch.clientY;
+}, false);
+// Capturar fim do toque e calcular direção
+document.addEventListener('touchend', function (e) {
+    const touch = e.changedTouches[0];
+    const dx = touch.clientX - touchStartX;
+    const dy = touch.clientY - touchStartY;
+    if (Math.abs(dx) > Math.abs(dy)) {
+        // Movimento horizontal
+        if (dx > 30 && direction !== 'left') {
+            nextDirection = 'right';
+            moveSound.currentTime = 0;
+            moveSound.play();
+        } else if (dx < -30 && direction !== 'right') {
+            nextDirection = 'left';
+            moveSound.currentTime = 0;
+            moveSound.play();
+        }
+    } else {
+        // Movimento vertical
+        if (dy > 30 && direction !== 'up') {
+            nextDirection = 'down';
+            moveSound.currentTime = 0;
+            moveSound.play();
+        } else if (dy < -30 && direction !== 'down') {
+            nextDirection = 'up';
+            moveSound.currentTime = 0;
+            moveSound.play();
+        }
+    }
+}, false);
 // === SUGESTÕES DE MELHORIAS ===
 /**
  * 5. Controle por toque: suportar mobile com gestos.
- * 9. Animações extras: partículas ou efeitos ao comer a comida.
  */
