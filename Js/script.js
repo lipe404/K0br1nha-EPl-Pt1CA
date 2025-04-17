@@ -597,7 +597,7 @@ document.getElementById('restart-button').addEventListener('click', () => {
     startCountdownAndGame();
 });
 // Mensagem inicial
-messageDisplay.textContent = "Clique em 'Faça a cobra nascer' para jogar!";
+messageDisplay.textContent = "Arraste o dedo no touch para mover a cobra, ou use as setas do teclado";
 messageDisplay.style.display = 'block';
 // Iniciar animação de introdução
 window.onload = () => {
