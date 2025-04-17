@@ -53,6 +53,8 @@ let isGameOver = false; // Flag de fim de jogo
 let isGamePaused = false; // Flag de pausa
 let currentColorIndex = 0; // Índice da cor atual
 let obstacles = []; // Obstáculos
+// Posição do mouse para animação de intro
+let mouse = { x: null, y: null };
 // Cores do corpo da cobra
 const snakeColors = [
     '#4CAF50', '#FF5722', '#FFC107', '#FF9800', '#CDDC39',
@@ -154,6 +156,8 @@ class IntroSnake {
             y: this.y - i * 10 * Math.sin(this.direction)
         }));
         this.color = snakeColors[Math.floor(Math.random() * snakeColors.length)];
+        this.scared = false;
+        this.scareTimer = 0;
     }
     update() {
         const dx = Math.cos(this.direction) * this.speed;
@@ -163,17 +167,48 @@ class IntroSnake {
         // Rebater nas bordas
         if (this.x < 0 || this.x > canvas.width) this.direction = Math.PI - this.direction;
         if (this.y < 0 || this.y > canvas.height) this.direction = -this.direction;
+        // Interação com o mouse (efeito de fuga)
+        if (mouse.x !== null && mouse.y !== null) {
+            const distX = this.x - mouse.x;
+            const distY = this.y - mouse.y;
+            const distance = Math.sqrt(distX * distX + distY * distY);
+            const escapeRadius = 80;
+            if (distance < escapeRadius) {
+                // Direção oposta ao mouse
+                this.direction = Math.atan2(distY, distX) + (Math.random() - 0.5) * 0.5;
+                this.scared = true;
+                this.scareTimer = 10;
+            }
+        }
+        // Contagem decrescente do susto
+        if (this.scareTimer > 0) {
+            this.scareTimer--;
+        } else {
+            this.scared = false;
+        }
         // Atualizar segmentos
         this.segments.pop();
         this.segments.unshift({ x: this.x, y: this.y });
     }
     draw(ctx) {
-        ctx.fillStyle = this.color;
-        ctx.strokeStyle = '#111';
         ctx.lineWidth = 1;
-        this.segments.forEach(seg => {
+        this.segments.forEach((seg, i) => {
+            // Efeito de susto: brilho e vibração
+            let offsetX = 0, offsetY = 0;
+            let color = this.color;
+            if (this.scared) {
+                offsetX = (Math.random() - 0.5) * 4; // vibração leve
+                offsetY = (Math.random() - 0.5) * 4;
+                color = 'white'; // flash branco
+                ctx.shadowColor = this.color;
+                ctx.shadowBlur = 15;
+            } else {
+                ctx.shadowBlur = 0;
+            }
+            ctx.fillStyle = color;
+            ctx.strokeStyle = '#111';
             ctx.beginPath();
-            roundRect(ctx, seg.x, seg.y, 10, 10, 3);
+            roundRect(ctx, seg.x + offsetX, seg.y + offsetY, 10, 10, 3);
             ctx.fill();
             ctx.stroke();
         });
@@ -565,10 +600,13 @@ messageDisplay.style.display = 'block';
 window.onload = () => {
     startIntroAnimation();
 };
-
+canvas.addEventListener('mousemove', function (e) {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
+});
 // === SUGESTÕES DE MELHORIAS ===
 /**
  * 5. Controle por toque: suportar mobile com gestos.
- * 7. Pausar/Reiniciar: criar botão para pausar e reiniciar.
  * 9. Animações extras: partículas ou efeitos ao comer a comida.
  */
