@@ -150,7 +150,7 @@ class IntroSnake {
         this.y = Math.random() * canvas.height;
         this.direction = Math.random() * 2 * Math.PI;
         this.speed = 1 + Math.random() * 2;
-        this.length = 5 + Math.floor(Math.random() * 5);
+        this.length = 10 + Math.floor(Math.random() * 5);
         this.segments = Array.from({ length: this.length }, (_, i) => ({
             x: this.x - i * 10 * Math.cos(this.direction),
             y: this.y - i * 10 * Math.sin(this.direction)
