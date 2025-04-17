@@ -45,8 +45,11 @@ h1 {
 /* Display de pontuação */
 #score-display {
     margin: 10px 0;
-    font-size: 20px;
-    color: #333;
+    font-size: 24px;
+    font-weight: bold;
+    color: #eb1599;
+    background-size: 300% 300%;
+    animation: brilhoScore 5s ease infinite;
     transition: all 0.3s ease;
 }
 /* Exibição de Mensagens */
@@ -267,5 +270,16 @@ p {
     to {
         opacity: 1;
         transform: translate(-50%, -50%) scale(1);
+    }
+}
+@keyframes brilhoScore {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
     }
 }
