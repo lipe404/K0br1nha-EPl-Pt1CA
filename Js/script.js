@@ -17,6 +17,29 @@ const startButton = document.getElementById('start-button');
 const scoreDisplay = document.createElement('div');
 scoreDisplay.id = 'score-display';
 document.body.insertBefore(scoreDisplay, startButton);
+// Menu de pausa
+const pauseMenu = document.createElement('div');
+pauseMenu.id = 'pause-menu';
+pauseMenu.style.display = 'none';
+pauseMenu.innerHTML = `
+  <div class="menu-box">
+    <h2>Jogo Pausado</h2>
+    <button id="resume-button">Retomar</button>
+    <button id="restart-button">Reiniciar</button>
+  </div>
+`;
+// Botão de início
+const playButton = document.createElement('button');
+playButton.id = 'play-button';
+playButton.textContent = 'Jogar';
+playButton.classList.add('btn-inicio-psicodelico');
+playButton.style.display = 'flex'; // Só aparece na intro
+document.body.appendChild(playButton);
+document.body.appendChild(pauseMenu);
+// Variáveis do loop de introdução
+let introSnakes = [];
+let introAnimationLoop;
+let isIntroRunning = true;
 // Variáveis do jogo
 let snake = []; // Armazena os segmentos da cobrinha
 let food = {}; // Posição da comida
@@ -27,6 +50,7 @@ let speedLevel = 0; // Nível de velocidade
 let score = 0; // Pontuação inicial
 let gameLoop; // Loop do jogo
 let isGameOver = false; // Flag de fim de jogo
+let isGamePaused = false; // Flag de pausa
 let currentColorIndex = 0; // Índice da cor atual
 let obstacles = []; // Obstáculos
 // Cores do corpo da cobra
@@ -86,6 +110,7 @@ function initGame() {
     gameSpeed = 150;
     currentColorIndex = 0;
     isGameOver = false;
+    isGamePaused = false;
     obstacles = [];
     // Resetar cores
     targetBackgroundColor = backgroundColors[0];
@@ -95,6 +120,7 @@ function initGame() {
     // Atualizar UI
     scoreDisplay.textContent = `Pontuação: ${score}`;
     messageDisplay.style.display = 'none';
+    pauseMenu.style.display = 'none';
     // Gerar primeira comida
     generateFood();
     // Limpar qualquer jogo anterior e iniciar novo
@@ -102,6 +128,77 @@ function initGame() {
     gameLoop = setInterval(gameStep, gameSpeed);
     music.play();
 }
+// Função de introdução
+function startIntroAnimation() {
+    // Criar cobras
+    introSnakes = Array.from({ length: 15 }, () => new IntroSnake());
+    introAnimationLoop = setInterval(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        introSnakes.forEach(snake => {
+            snake.update();
+            snake.draw(ctx);
+        });
+    }, 1000 / 60); // 60 FPS
+    playButton.style.display = 'block';
+}
+// Cobras de introdução
+class IntroSnake {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.direction = Math.random() * 2 * Math.PI;
+        this.speed = 1 + Math.random() * 2;
+        this.length = 5 + Math.floor(Math.random() * 5);
+        this.segments = Array.from({ length: this.length }, (_, i) => ({
+            x: this.x - i * 10 * Math.cos(this.direction),
+            y: this.y - i * 10 * Math.sin(this.direction)
+        }));
+        this.color = snakeColors[Math.floor(Math.random() * snakeColors.length)];
+    }
+    update() {
+        const dx = Math.cos(this.direction) * this.speed;
+        const dy = Math.sin(this.direction) * this.speed;
+        this.x += dx;
+        this.y += dy;
+        // Rebater nas bordas
+        if (this.x < 0 || this.x > canvas.width) this.direction = Math.PI - this.direction;
+        if (this.y < 0 || this.y > canvas.height) this.direction = -this.direction;
+        // Atualizar segmentos
+        this.segments.pop();
+        this.segments.unshift({ x: this.x, y: this.y });
+    }
+    draw(ctx) {
+        ctx.fillStyle = this.color;
+        ctx.strokeStyle = '#111';
+        ctx.lineWidth = 1;
+        this.segments.forEach(seg => {
+            ctx.beginPath();
+            roundRect(ctx, seg.x, seg.y, 10, 10, 3);
+            ctx.fill();
+            ctx.stroke();
+        });
+    }
+}
+// Contagem regressiva
+function startCountdownAndGame() {
+    clearInterval(introAnimationLoop);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let countdown = 3;
+    const countdownInterval = setInterval(() => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 72px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(countdown, canvas.width / 2, canvas.height / 2);
+        countdown--;
+        if (countdown < 0) {
+            clearInterval(countdownInterval);
+            isIntroRunning = false;
+            initGame(); // Inicia o jogo real
+        }
+    }, 1000);
+}
+
 // Ajustar velocidade do jogo
 function adjustGameSpeed() {
     // A cada 50 pontos, aumenta o nível de dificuldade
@@ -146,7 +243,6 @@ function generateObstacles(level) {
         obstacles.push({x: newX, y: newY});
     }
 }
-
 // Desenhar obstáculos
 function drawObstacles() {
     ctx.fillStyle = '#555';
@@ -159,7 +255,6 @@ function drawObstacles() {
         ctx.stroke();
     });
 }
-
 // Gerar comida em posição aleatória
 function generateFood() {
     const gridSize = canvas.width / 20;
@@ -429,15 +524,51 @@ document.addEventListener('keydown', (e) => {
     }
 });
 // Botão de início
-startButton.addEventListener('click', initGame);
+startButton.addEventListener('click', () => {
+    if (!isGameOver && !isIntroRunning) return;
+    startCountdownAndGame();
+});
+playButton.addEventListener('click', () => {
+    playButton.style.display = 'none';
+    startCountdownAndGame();
+});
+// Botão de pause/retomar
+window.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !isIntroRunning && !isGameOver) {
+        togglePauseGame();
+    }
+});
+//Função para pausar o jogo
+function togglePauseGame() {
+    isGamePaused = !isGamePaused;
+    if (isGamePaused) {
+        clearInterval(gameLoop);
+        pauseMenu.style.display = 'block';
+    } else {
+        pauseMenu.style.display = 'none';
+        gameLoop = setInterval(gameStep, gameSpeed);
+    }
+}
+document.getElementById('resume-button').addEventListener('click', () => {
+    togglePauseGame();
+});
+
+document.getElementById('restart-button').addEventListener('click', () => {
+    pauseMenu.style.display = 'none';
+    isGameOver = true;
+    startCountdownAndGame();
+});
 // Mensagem inicial
 messageDisplay.textContent = "Clique em 'Faça a cobra nascer' para jogar!";
 messageDisplay.style.display = 'block';
+// Iniciar animação de introdução
+window.onload = () => {
+    startIntroAnimation();
+};
 
 // === SUGESTÕES DE MELHORIAS ===
 /**
  * 5. Controle por toque: suportar mobile com gestos.
- * 6. Sons: adicionar efeitos sonoros e trilha de fundo.
  * 7. Pausar/Reiniciar: criar botão para pausar e reiniciar.
  * 9. Animações extras: partículas ou efeitos ao comer a comida.
  */

@@ -33,10 +33,12 @@ h1 {
 /* Container do Jogo */
 #game-container {
     position: relative;
+    width: fit-content;
     transition: all 0.3s ease;
 }
 /* Canvas do Jogo */
 #game-canvas {
+    display: block;
     border: 2px solid #f875dc;
     box-shadow: 0 0 15px #f875dc, 0 0 30px #7d75f5, 0 0 45px #bb71f7;
 }
@@ -64,6 +66,34 @@ h1 {
     animation: fadeInScale 0.6s forwards;
 }
 /* Botão de Início */
+.btn-inicio-psicodelico {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+    padding: 14px 32px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(270deg, #ff00cc, #3333ff, #00ffff, #ffcc00, #ff00cc);
+    background-size: 600% 600%;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: backgroundFlow 8s ease infinite;
+    z-index: 10;
+}
+.btn-inicio-psicodelico::before {
+    content: "";
+    position: absolute;
+    background: linear-gradient(120deg, rgba(255,255,255,0.2), rgba(255,255,255,0.8), rgba(255,255,255,0.2));
+    animation: shine 2.5s infinite;
+    pointer-events: none;
+}
 #start-button {
     position: relative;
     overflow: hidden;
@@ -116,6 +146,55 @@ p {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     animation: backgroundFlow 8s ease infinite;
 }
+/* Botão de Pausa */
+#pause-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px) brightness(0.7);
+    z-index: 20;
+}
+#pause-menu .menu-box {
+    background: linear-gradient(135deg, #ff00ccaa, #3333ffaa);
+    border: 2px solid #fff;
+    border-radius: 16px;
+    padding: 40px;
+    text-align: center;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.2);
+    animation: popupFade 0.5s ease-out;
+}
+#pause-menu h2 {
+    font-size: 28px;
+    color: #fff;
+    text-shadow: 0 0 6px #fff;
+    margin-bottom: 24px;
+}
+#pause-menu button {
+    display: inline-block;
+    margin: 10px;
+    padding: 14px 28px;
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    background: linear-gradient(270deg, #00ffff, #ffcc00, #ff00cc);
+    background-size: 400% 400%;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    text-shadow: 0 0 6px rgba(255, 255, 255, 0.7);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    animation: backgroundFlow 6s ease infinite;
+}
+#pause-menu button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
 /* Animação de Fundo */
 @keyframes bgAnim {
     0% { background-position: 0% 50%; }
@@ -131,6 +210,10 @@ p {
 @keyframes shine {
     0% { left: -75%; }
     100% { left: 125%; }
+}
+@keyframes popupFade {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
 }
 /* Animação do título */
 @keyframes colorCycle {
