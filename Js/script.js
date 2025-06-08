@@ -664,7 +664,3 @@ document.addEventListener('touchend', function (e) {
         }
     }
 }, false);
-// === SUGESTÕES DE MELHORIAS ===
-/**
- * 5. Controle por toque: suportar mobile com gestos.
- */
