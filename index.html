@@ -32,32 +32,5 @@
         <button id="start-button">Faça a cobra nascer</button>
         <!-- JavaScript -->
         <script src="Js/script.js"></script>
-
-        <!--Script para controles hud por toque
-        <script>
-            // Criar controles de toque
-            const touchControls = document.createElement('div');
-            touchControls.id = 'touch-controls';
-            touchControls.innerHTML = `
-            <button id="up-btn" class="touch-btn">↑</button>
-            <button id="left-btn" class="touch-btn">←</button>
-            <button id="right-btn" class="touch-btn">→</button>
-            <button id="down-btn" class="touch-btn">↓</button>
-            `;
-            document.body.appendChild(touchControls);
-
-            document.getElementById('up-btn').addEventListener('click', () => {
-                if (direction !== 'down') nextDirection = 'up';
-            });
-            document.getElementById('down-btn').addEventListener('click', () => {
-                if (direction !== 'up') nextDirection = 'down';
-            });
-            document.getElementById('left-btn').addEventListener('click', () => {
-                if (direction !== 'right') nextDirection = 'left';
-            });
-            document.getElementById('right-btn').addEventListener('click', () => {
-                if (direction !== 'left') nextDirection = 'right';
-            });
-        </script> -->
     </body>
 </html>
