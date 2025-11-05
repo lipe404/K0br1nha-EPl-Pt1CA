@@ -1,12 +1,3 @@
-/**
- * Jogo da Cobrinha EPléPt1CA - Versão Modularizada
- * Desenvolvido por Felipe Toledo @spaceman.404
- *
- * Este arquivo integra todos os módulos do jogo para criar uma experiência completa.
- * Arquitetura modular para facilitar manutenção e expansão.
- */
-
-// Importar todos os módulos
 import { Snake } from "./modules/Snake.js";
 import { Food } from "./modules/Food.js";
 import { Obstacles } from "./modules/Obstacles.js";
@@ -62,7 +53,7 @@ class Game {
     this.soundManager = new SoundManager();
     this.introAnimation = new IntroAnimation(this.canvas, this.ctx);
 
-    // Criar estado do jogo (precisa de todos os componentes)
+    // Criar estado do jogo
     this.gameState = new GameState(
       this.snake,
       this.food,
@@ -105,8 +96,8 @@ class Game {
 window.addEventListener("load", () => {
   try {
     const game = new Game();
-    console.log("🎮 Jogo inicializado com sucesso!");
+    console.log("Jogo inicializado com sucesso!");
   } catch (error) {
-    console.error("❌ Erro ao inicializar o jogo:", error);
+    console.error("Erro ao inicializar o jogo:", error);
   }
 });
