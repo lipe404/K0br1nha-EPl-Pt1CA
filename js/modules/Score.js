@@ -15,10 +15,18 @@ export class Score {
 
     // Criar elemento de pontuação
     createScoreDisplay() {
-        this.scoreDisplay = document.createElement('div');
-        this.scoreDisplay.id = 'score-display';
-        const startButton = document.getElementById('start-button');
-        document.body.insertBefore(this.scoreDisplay, startButton);
+        // Verificar se já existe
+        this.scoreDisplay = document.getElementById('score-display');
+        if (!this.scoreDisplay) {
+            this.scoreDisplay = document.createElement('div');
+            this.scoreDisplay.id = 'score-display';
+            const startButton = document.getElementById('start-button');
+            if (startButton) {
+                document.body.insertBefore(this.scoreDisplay, startButton);
+            } else {
+                document.body.appendChild(this.scoreDisplay);
+            }
+        }
         this.updateDisplay();
     }
 

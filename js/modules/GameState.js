@@ -28,27 +28,32 @@ export class GameState {
 
     // Configurar elementos da UI
     setupUI() {
-        // Menu de pausa
-        const pauseMenu = document.createElement('div');
-        pauseMenu.id = 'pause-menu';
-        pauseMenu.style.display = 'none';
-        pauseMenu.innerHTML = `
-          <div class="menu-box">
-            <h2>Jogo Pausado</h2>
-            <button id="resume-button">Retomar</button>
-            <button id="restart-button">Reiniciar</button>
-          </div>
-        `;
+        // Menu de pausa - verificar se já existe
+        let pauseMenu = document.getElementById('pause-menu');
+        if (!pauseMenu) {
+            pauseMenu = document.createElement('div');
+            pauseMenu.id = 'pause-menu';
+            pauseMenu.style.display = 'none';
+            pauseMenu.innerHTML = `
+              <div class="menu-box">
+                <h2>Jogo Pausado</h2>
+                <button id="resume-button">Retomar</button>
+                <button id="restart-button">Reiniciar</button>
+              </div>
+            `;
+            document.body.appendChild(pauseMenu);
+        }
         
-        // Botão de início
-        const playButton = document.createElement('button');
-        playButton.id = 'play-button';
-        playButton.textContent = 'Jogar';
-        playButton.classList.add('btn-inicio-psicodelico');
-        playButton.style.display = 'none'; // Só aparece na intro
-        
-        document.body.appendChild(playButton);
-        document.body.appendChild(pauseMenu);
+        // Botão de início - verificar se já existe
+        let playButton = document.getElementById('play-button');
+        if (!playButton) {
+            playButton = document.createElement('button');
+            playButton.id = 'play-button';
+            playButton.textContent = 'Jogar';
+            playButton.classList.add('btn-inicio-psicodelico');
+            playButton.style.display = 'none'; // Só aparece na intro
+            document.body.appendChild(playButton);
+        }
     }
 
     // Inicializar o jogo
