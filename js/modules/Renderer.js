@@ -12,12 +12,44 @@ export class Renderer {
         this.ctx = ctx;
         this.messageDisplay = document.getElementById('message-display');
         
+        // Configurar canvas para evitar blur
+        this.setupCanvas();
+        
         // Sistema de transição de cores
         this.targetBackgroundColor = backgroundColors[0];
         this.currentBackgroundColor = hexToRgb(backgroundColors[0]);
         this.colorTransitionProgress = 1;
         this.colorTransitionSpeed = 0.05;
         this.currentColorIndex = 0;
+        
+        // Listener para fullscreen change
+        this.setupFullscreenListener();
+    }
+
+    // Configurar canvas para renderização nítida
+    setupCanvas() {
+        // Configurar imageSmoothing para qualidade alta
+        this.ctx.imageSmoothingEnabled = true;
+        this.ctx.imageSmoothingQuality = 'high';
+        
+        // Garantir que o canvas não tenha transformações CSS que causem blur
+        this.canvas.style.imageRendering = 'auto';
+        this.canvas.style.transform = 'none';
+    }
+
+    // Listener para mudanças de fullscreen
+    setupFullscreenListener() {
+        const handleFullscreenChange = () => {
+            // Pequeno delay para garantir que a transição terminou
+            setTimeout(() => {
+                this.setupCanvas();
+            }, 100);
+        };
+        
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('msfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
     }
 
     // Limpar canvas

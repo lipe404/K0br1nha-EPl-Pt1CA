@@ -40,17 +40,55 @@ export function roundRect(ctx, x, y, width, height, radius) {
 //Função para ativar o modo fullscreen
 export function entrarEmTelaCheia() {
     const el = document.documentElement;
-    if (el.requestFullscreen) {
-        el.requestFullscreen();
-    } else if (el.webkitRequestFullscreen) { // Safari
-        el.webkitRequestFullscreen();
-    } else if (el.msRequestFullscreen) { // IE/Edge antigos
-        el.msRequestFullscreen();
+    
+    // Tentar entrar em fullscreen
+    const requestFullscreen = el.requestFullscreen || 
+                               el.webkitRequestFullscreen || 
+                               el.msRequestFullscreen ||
+                               el.mozRequestFullScreen;
+    
+    if (requestFullscreen) {
+        requestFullscreen.call(el).catch(err => {
+            console.log('Erro ao entrar em fullscreen:', err);
+        });
     }
-    document.addEventListener('fullscreenchange', () => {
-        if (!document.fullscreenElement) {
-            const pauseMenu = document.getElementById('pause-menu');
-            if (pauseMenu) pauseMenu.style.display = 'block';
+    
+    // Listener para saída do fullscreen
+    const handleFullscreenChange = () => {
+        const isFullscreen = document.fullscreenElement || 
+                           document.webkitFullscreenElement || 
+                           document.msFullscreenElement ||
+                           document.mozFullScreenElement;
+        
+        if (!isFullscreen) {
+            // Corrigir blur do canvas ao sair do fullscreen
+            const canvas = document.getElementById('game-canvas');
+            if (canvas) {
+                // Forçar re-renderização do canvas
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                    // Aplicar configurações para evitar blur
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    
+                    // Redesenhar uma vez para garantir que não está borrado
+                    // Isso será feito automaticamente no próximo gameStep
+                }
+                
+                // Garantir que o canvas não está com transformações
+                canvas.style.transform = 'none';
+                canvas.style.imageRendering = 'auto';
+            }
+            
+            // Não pausar automaticamente - deixar o usuário continuar jogando
+            // const pauseMenu = document.getElementById('pause-menu');
+            // if (pauseMenu) pauseMenu.style.display = 'block';
         }
-    });
+    };
+    
+    // Adicionar listeners para diferentes navegadores
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+    document.addEventListener('msfullscreenchange', handleFullscreenChange);
+    document.addEventListener('mozfullscreenchange', handleFullscreenChange);
 }

@@ -5,6 +5,8 @@
 
 import { GAME_CONFIG, funnyMessages } from './GameConfig.js';
 import { entrarEmTelaCheia } from './Utils.js';
+import { PowerUpSystem } from './PowerUpSystem.js';
+import { FOOD_TYPES } from './GameConfig.js';
 
 export class GameState {
     constructor(snake, food, score, obstacles, soundManager, renderer, introAnimation) {
@@ -15,6 +17,9 @@ export class GameState {
         this.soundManager = soundManager;
         this.renderer = renderer;
         this.introAnimation = introAnimation;
+        
+        // Sistema de power-ups
+        this.powerUpSystem = new PowerUpSystem();
         
         // Estado do jogo
         this.gameSpeed = GAME_CONFIG.INITIAL_SPEED;
@@ -65,11 +70,13 @@ export class GameState {
         this.score.reset();
         this.obstacles.clear();
         this.renderer.resetColors();
+        this.powerUpSystem.clear();
         
         // Resetar estado
         this.gameSpeed = GAME_CONFIG.INITIAL_SPEED;
         this.isGameOver = false;
         this.isGamePaused = false;
+        this.powerUpSystem.baseSpeed = GAME_CONFIG.INITIAL_SPEED;
         
         // Atualizar UI
         this.renderer.hideMessage();
@@ -106,9 +113,20 @@ export class GameState {
     adjustGameSpeed() {
         // Verificar se deve aumentar velocidade
         if (this.score.shouldIncreaseSpeed()) {
-            this.gameSpeed = Math.max(GAME_CONFIG.MIN_SPEED, this.gameSpeed - 10);
-            clearInterval(this.gameLoop);
-            this.gameLoop = setInterval(() => this.gameStep(), this.gameSpeed);
+            const newSpeed = Math.max(GAME_CONFIG.MIN_SPEED, this.gameSpeed - 10);
+            
+            // Atualizar velocidade base no power-up system
+            this.powerUpSystem.updateBaseSpeed(newSpeed);
+            
+            // Se turbo não está ativo, atualizar velocidade do jogo
+            if (!this.powerUpSystem.isTurboActive()) {
+                this.gameSpeed = newSpeed;
+                clearInterval(this.gameLoop);
+                this.gameLoop = setInterval(() => this.gameStep(), this.gameSpeed);
+            } else {
+                // Turbo ativo, apenas atualizar base speed
+                this.gameSpeed = newSpeed;
+            }
         }
         
         // Verificar se deve adicionar obstáculos
@@ -120,25 +138,65 @@ export class GameState {
 
     // Lógica quando a cobra come a comida
     handleFoodEaten() {
+        const foodType = this.food.getType();
+        
         // Tocar som de comida
         this.soundManager.play('food');
         
-        // Aumentar pontuação
-        this.score.add();
+        // Aplicar efeito do power-up (inclui pontos para comida normal)
+        this.powerUpSystem.applyEffect(foodType, this, this.snake, this.score);
         
-        // Iniciar transição de cor
-        this.snake.updateColorIndex();
-        this.renderer.startColorTransition();
+        // Iniciar transição de cor (apenas para comidas normais e douradas)
+        if (foodType === FOOD_TYPES.NORMAL || foodType === FOOD_TYPES.GOLDEN) {
+            this.snake.updateColorIndex();
+            this.renderer.startColorTransition();
+        }
         
-        // Aumentar velocidade (com limite mínimo)
-        this.gameSpeed = Math.max(GAME_CONFIG.MIN_SPEED, this.gameSpeed - GAME_CONFIG.SPEED_DECREASE);
-        clearInterval(this.gameLoop);
-        this.gameLoop = setInterval(() => this.gameStep(), this.gameSpeed);
+        // Aumentar velocidade (com limite mínimo) - apenas para comidas normais
+        if (foodType === FOOD_TYPES.NORMAL) {
+            const newSpeed = Math.max(GAME_CONFIG.MIN_SPEED, this.gameSpeed - GAME_CONFIG.SPEED_DECREASE);
+            this.powerUpSystem.updateBaseSpeed(newSpeed);
+            
+            if (!this.powerUpSystem.isTurboActive()) {
+                this.gameSpeed = newSpeed;
+                clearInterval(this.gameLoop);
+                this.gameLoop = setInterval(() => this.gameStep(), this.gameSpeed);
+            } else {
+                this.gameSpeed = newSpeed;
+            }
+        }
         
-        // Mostrar mensagem e gerar nova comida
-        this.adjustGameSpeed(); // Aqui ocorre o aumento de dificuldade progressivo
-        this.showRandomMessage();
+        // Mostrar mensagem específica baseada no tipo
+        this.showFoodMessage(foodType);
+        
+        // Ajustar velocidade do jogo (aumento progressivo)
+        this.adjustGameSpeed();
+        
+        // Gerar nova comida
         this.food.generate(this.snake, this.obstacles.getList());
+    }
+
+    // Mostrar mensagem baseada no tipo de comida
+    showFoodMessage(foodType) {
+        let message = '';
+        switch (foodType) {
+            case FOOD_TYPES.GOLDEN:
+                message = '★ OURO! +50 pontos!';
+                break;
+            case FOOD_TYPES.POISON:
+                message = '☠ VENENO! Perdeu 1 segmento!';
+                break;
+            case FOOD_TYPES.TURBO:
+                message = '⚡ TURBO ATIVADO!';
+                break;
+            case FOOD_TYPES.JOKER:
+                message = '? CORINGA! Efeito aleatório!';
+                break;
+            default:
+                this.showRandomMessage();
+                return;
+        }
+        this.renderer.showMessage(message, 2000);
     }
 
     // Verificar colisões
@@ -174,6 +232,7 @@ export class GameState {
     gameOver(message) {
         this.isGameOver = true;
         clearInterval(this.gameLoop);
+        this.powerUpSystem.clear(); // Limpar power-ups ativos
         this.soundManager.play('gameOver');
         this.soundManager.stopMusic();
         this.renderer.showMessage(`${message} Pontuação final: ${this.score.getCurrent()}`, 0);
@@ -203,6 +262,7 @@ export class GameState {
         // Atualizar elementos
         this.snake.update();
         this.renderer.updateColors();
+        this.food.update(); // Atualizar animação da comida
         
         // Verificar se comeu comida
         if (this.food.checkCollision(this.snake)) {

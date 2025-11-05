@@ -37,9 +37,9 @@ export class Score {
         this.updateDisplay();
     }
 
-    // Adicionar pontos
+    // Adicionar pontos (pode ser negativo para penalidades)
     add(points = GAME_CONFIG.POINTS_PER_FOOD) {
-        this.current += points;
+        this.current = Math.max(0, this.current + points); // Não permitir pontuação negativa
         this.updateDisplay();
     }
 

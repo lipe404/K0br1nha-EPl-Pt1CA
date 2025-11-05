@@ -12,7 +12,19 @@ export const GAME_CONFIG = {
     SPEED_DECREASE: 2,
     POINTS_PER_FOOD: 10,
     SPEED_LEVEL_THRESHOLD: 50,
-    OBSTACLE_LEVEL_THRESHOLD: 100
+    OBSTACLE_LEVEL_THRESHOLD: 100,
+    GOLDEN_FOOD_POINTS: 50,
+    TURBO_DURATION: 5000, // 5 segundos em milissegundos
+    TURBO_SPEED_MULTIPLIER: 2
+};
+
+// Tipos de comida
+export const FOOD_TYPES = {
+    NORMAL: 'normal',
+    GOLDEN: 'golden',
+    POISON: 'poison',
+    TURBO: 'turbo',
+    JOKER: 'joker'
 };
 
 export const DIRECTIONS = {
